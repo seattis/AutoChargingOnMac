@@ -1,52 +1,89 @@
 # AutoCharging/DisCharging On Mac 
-This repository is used to set up battery level detection on a Mac and automatically turn charging on or off based on the user's settings.
+This repository provides a setup for battery level detection on a Mac, automatically turning charging on or off based on the user's settings.
 
-## Tools needed
-- *Home smart* App iOS
-- *shortcuts* App macOS
-- A smart plug connected with Mac charger (IKEA in my case)
-- *Automation* App on macOS
+## Tools Required
+- **Home Smart** app (iOS)
+- **Shortcuts** app (macOS)
+- A smart plug connected to the Mac charger (IKEA ***TRETAKT*** in my case)
+- **Automation** app (macOS)
 - Terminal
 
 ## Basic Setup
-Integrates Ikea smart with Home smart. In this way, the smart integrations can be directly controlled through shortcuts App, which
-is able to simplify our implementation.
-### shortcut App
-- add new shortcut through "+" on the corner
-- search for control home on the right-hand pannel and drag it to the left
-- locate the smart plug connected to the Macbook charger and set it to be ON, named as "Turn On Mac Charger"
-- similarly, create another shortcut and set it to be OFF, named as "Turn Off Mac Charger"
+<img src="Images/IKEA%20Home.png" alt="Example Image" width="100">
+<img src="Images/Apple%20Home.png" alt="Example Image" width="100">
 
-Now, the steps needed for shortcut are done.
+First, integrate the IKEA smart plug with the **Home Smart** app. This allows for direct control via the **Shortcuts** app, 
+simplifying the automation process.
 
-### Automation App
+Follow the guide below to connect your smart plug to the **IKEA Smart** mobile app:
+- [IKEA Smart Plug Setup](https://www.ikea.com/au/en/p/tretakt-plug-smart-10556517/)
 
-Download the zip file called automation app and unzip to the location desired. Its absolute path should be used later for 
-background running.
+Once set up, your smart plug should be ready for automation.
 
-If you would like to set the charge/discharge limit on your own, please modify the following section:
+### Shortcuts App Setup
+<img src="Images/Shortcuts.png" alt="Example Image" width="100">
+
+1. Open the **Shortcuts** app.
+2. Click the add button <img src="Images/Add_button.png" alt="Example Image" width="15"> in the top corner.
+3. Name the shortcut "**Turn On Mac Charger**". 
+4. Search for <img src="Images/ControlHome.png" alt="Example Image" width="100"> on the right-hand side and drag it to the left
+5. Select the smart plug, click **Next**, and set it to **ON**.
+6. Create another shortcut, set it to **OFF**, and name it "**Turn Off Mac Charger**".
+
+Now you should have two new shortcuts:
+
+<img src="Images/TwoShortcuts.png" alt="Example Image" width="300">
+
+### Automation App Setup
+1. Download and unzip **BatteryMonitorAutomation.app** to your desired location.
+2. Note the absolute path, as it will be needed for background execution.
+3. If you want to customize the charging/discharging limits, modify the following lines in the script:
+   - `if batteryStatus contains "AC Power" and batteryLevel is greater than 95 then`
+   
+     The discharge limit is currently set to 95%.
+   - `else if batteryStatus contains "Battery Power" and batteryLevel is less than 30 then`
+
+     The charging limit is currently set to 30%.
+
+4. Save the file after making changes.
 
 
-## Terminal Running
-Download the attached .plist file to /Users/YourUserName/Library/LaunchAgents/com.YourUserName.batterymonitor.plist. In this file,
-it will call to open the automation app that we've written earlier, check the battery level to see whether it meets the conditions and
-make decision whether to plug on/off the charger. This check should run every 5 minutes and runs when the file is running.
+## Running via Terminal
+1. Download the attached `.plist` file and move it to
+   `/Users/YourUserName/Library/LaunchAgents/com.YourUserName.batterymonitor.plist`. 
+2. This file runs the automation app every **5 minutes** and checks the battery level.
+   - If the battery is above the set threshold, the charger will turn **off**.
+   - If the battery drops below the set threshold, the charger will turn **on**.
+   - The interval is controlled by:
+     
+     `<key>StartInterval</key>`
+     
+     `<integer>300</integer>`.
+   - The system will restart the process in case of errors via:
+     
+     `<key>KeepAlive</key>`
 
-To make it run on the background without opening terminal and shortcuts, automation, run the following command:
-launchctl load ~/Library/LaunchAgents/com.YourUserName.batterymonitor.plist
+     `<true/>`.
 
-If any modifications are done to the plist file or to the Automation Applescript, please unload the .plist file and load again.
-The command for unloading is
-launchctl unload ~/Library/LaunchAgents/com.YourUserName.batterymonitor.plist.
+3. Run the following command to execute the script in the background:
 
-After running the command, nothing will be printed out on the screen.
+   `launchctl load ~/Library/LaunchAgents/com.YourUserName.batterymonitor.plist`
+4. If you modify the `.plist` file or **Automation AppleScript**, you must first **unload** and then **reload** the file:
+
+   `launchctl unload ~/Library/LaunchAgents/com.YourUserName.batterymonitor.plist`
+
+   `launchctl load ~/Library/LaunchAgents/com.YourUserName.batterymonitor.plist`
+
+5. The script runs in the background without printing output to the terminal.
+
+
+## Further Improvements
+I'll later add log files to this repo for monitoring and debugging.
 
 ## Conclusion
-Though the setup above, the battery level of Macbook can be monitored and when it reaches the desired level, its charger 
-controlled by smart plug will be turned on or off automatically with app running at the background. This helps to better 
-preserve battery life.
+With this setup, your MacBook’s battery level will be automatically monitored. When the battery reaches the specified level, 
+the smart plug will turn the charger **on** or **off**, running in the background without manual intervention. This helps to extend battery 
+lifespan by preventing overcharging.
 
-Hope this repo helps.
-
-If you have any questions, please let me know via seattis@gmail.com.
+I hope this repository helps! If you have any questions, feel free to reach out at [seattis@gmail.com](mailto:seattis@gmail.com). 🚀
 
